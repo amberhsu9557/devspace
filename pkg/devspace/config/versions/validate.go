@@ -10,6 +10,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 
 	"github.com/loft-sh/devspace/pkg/devspace/config/versions/latest"
+	"github.com/loft-sh/devspace/pkg/util/log"
 	"github.com/loft-sh/devspace/pkg/util/dockerfile"
 	"github.com/loft-sh/devspace/pkg/util/encoding"
 	"github.com/loft-sh/devspace/pkg/util/yamlutil"
@@ -317,7 +318,8 @@ func validateImages(config *latest.Config) error {
 			return errors.Errorf("images.%s.build.custom.command or images.%s.build.custom.commands is required", imageConfigName, imageConfigName)
 		}
 		if images[imageConf.Image] {
-			return errors.Errorf("multiple image definitions with the same image name are not allowed")
+			log.GetInstance().Warnf("images.*.image '%s' is used multiple times\n", imageConf.Image)
+			// return errors.Errorf("multiple image definitions with the same image name are not allowed")
 		}
 		if imageConf.RebuildStrategy != "" && imageConf.RebuildStrategy != latest.RebuildStrategyDefault && imageConf.RebuildStrategy != latest.RebuildStrategyAlways && imageConf.RebuildStrategy != latest.RebuildStrategyIgnoreContextChanges {
 			return errors.Errorf("images.%s.rebuildStrategy %s is invalid. Please choose one of %v", imageConfigName, string(imageConf.RebuildStrategy), []latest.RebuildStrategy{latest.RebuildStrategyAlways, latest.RebuildStrategyIgnoreContextChanges})
